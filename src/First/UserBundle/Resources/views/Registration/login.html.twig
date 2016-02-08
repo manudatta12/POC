@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{% block otheruserlogin %}
+<form id="form-otherlogin" action="{{ path("first_user_security_check") }}" method="post">
+		
+<h2 class="h2Heading"><span>L</span>User Login</h2>
+<div class="row">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+ <div class="rowFull">
+          <div class="half">
+            <div class="inL">Email ID : <span class="star">*</span></div>
+            <div class="inR">
+		<input type="text" id="username" name="_username" value="{{ last_username }}" required="required" />
+            </div>
+          </div>
+          <div class="half">
+            <div class="inL">Password :<span class="star">*</span></div>
+            <div class="inR">
+		<input type="password" id="password" name="_password" required="required" />
+            </div>
+          </div>
+        </div>
+        <!-- rowFull -->
+<span id="otherdivError" style="color:red">{{ error }}</span>
+ <div class="rowFull">
+<input type="submit"  class="submitBut" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans({}, 'FOSUserBundle') }}" />
+        </div>
+        <!-- rowFull -->
+</div>
+	</form>
+
+<div style="text-align:right;"><a href="{{ path('fos_user_resetting_request') }}">Forgot password ?</a></div>
+
+{% endblock %}
+{% endblock %}

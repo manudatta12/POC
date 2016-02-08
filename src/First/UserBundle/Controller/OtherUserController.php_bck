@@ -1,0 +1,154 @@
+<?php
+
+namespace First\UserBundle\Controller;
+
+use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
+use FOS\UserBundle\Model\UserInterface;
+
+
+use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Doctrine\ORM\EntityManager;
+use AppBundle\Entity\User;
+use First\UserBundle\Form\Type\RegistrationFormType;
+
+
+
+class OtherUserController extends Controller
+{
+	/**
+	 * @Route("/login", name="user_index_login")
+	 * @Template()
+	 */
+	public function indexAction()
+	{
+		$securityContext = $this->container->get('security.context');
+		if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ){
+			// authenticated REMEMBERED, FULLY will imply REMEMBERED (NON anonymous)
+			return $this->redirect($this->generateUrl('fos_user_profile_show'));
+		}
+		return array();
+	}
+
+	/**
+	 * @Route("/thinkdigittekologin", name="user_login")
+	 * @Template()
+	 */
+	public function loginAction()
+	{
+        $request = $this->container->get('request');
+        /* @var $request \Symfony\Component\HttpFoundation\Request */
+        $session = $request->getSession();
+        /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+
+        // get the error if any (works with forward and redirect -- see below)
+        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+        } elseif (null !== $session && $session->has(SecurityContext::AUTHENTICATION_ERROR)) {
+            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
+            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
+        } else {
+            $error = '';
+        }
+
+        if ($error) {
+            // TODO: this is a potential security risk (see http://trac.symfony-project.org/ticket/9523)
+            $error = $error->getMessage();
+        }
+        // last username entered by the user
+        $lastUsername = (null === $session) ? '' : $session->get(SecurityContext::LAST_USERNAME);
+
+        $csrfToken = $this->container->get('form.csrf_provider')->generateCsrfToken('authenticate');
+
+        return array(
+            'last_username' => $lastUsername,
+            'error'         => $error,
+            'csrf_token' => $csrfToken,
+        );
+	}
+	
+
+	/**
+	 * @Route("/register123/", name = "user_register")
+	 * @Template()
+	 */ 
+	public function registerAction(Request $request)
+	{
+
+        $form = $this->container->get('fos_user.registration.form');
+        $formHandler = $this->container->get('fos_user.registration.form.handler');
+        $confirmationEnabled = $this->container->getParameter('fos_user.registration.confirmation.enabled');
+
+        $process = $formHandler->process($confirmationEnabled);
+		if ($request->isXmlHttpRequest()) {
+					if ($process) {
+						$user = $form->getData();
+						$authUser = false;
+						if ($confirmationEnabled) {
+							$this->container->get('session')->set('fos_user_send_confirmation_email/email', $user->getEmail());
+							//$route = 'fos_user_registration_check_email';
+							$result = array('success' => false, 'email'=>false);
+						} else {
+							$authUser = true;
+							$result = array('success' => true);
+							//$route = 'fos_user_registration_confirmed';
+						}
+						$this->setFlash('fos_user_success', 'registration.flash.user_created');
+						$response = new Response(json_encode($result));
+						$response->headers->set('Content-Type', 'application/json');
+						if ($authUser) {
+							$this->authenticateUser($user, $response);
+						}
+						return $response;
+					}
+				$userEmail = $form->getData()->getEmail();
+				$User = $form->getData()->getUsername();
+
+				$UserName = $this->container->get('fos_user.user_manager')->findUserByUsername($User);
+				$Email = $this->container->get('fos_user.user_manager')->findUserByEmail($userEmail);
+
+				if($UserName != NULL){
+					$result = array('success' => false,'user'=>false);		
+				}
+				if($Email != NULL){
+					$result = array('success' => false,'email'=>false);
+				}
+				if($UserName != NULL && $Email != NULL){
+					$result = array('success' => false,'user'=>false,'email'=>false);
+				}
+				$response = new Response(json_encode($result));
+				$response->headers->set('Content-Type', 'application/json');
+				return $response;
+		}
+		return array(
+			// Last username entered by the user
+	            'form' => $form->createView(),
+	    );
+
+	}
+
+	/**
+	 * @Route("/thinkdigittekoresetting/request", name = "user_resetting_request")
+	 * @Template()
+	 */ 
+    public function requestAction()
+    {
+        return $this->container->get('templating')->renderResponse('FirstUserBundle:OtherUser:reseting.html.twig');
+    }
+
+
+
+
+}
+
+?>

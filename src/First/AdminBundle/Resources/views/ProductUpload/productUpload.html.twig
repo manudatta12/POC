@@ -1,0 +1,23 @@
+
+{% extends 'SonataAdminBundle::standard_layout.html.twig' %}
+
+{% block form %}
+
+<form class="form" method="POST" enctype="multipart/form-data" action="{{ admin.generateUrl('ProductUpload') }}" > 
+	<table>
+		<th>FILE MANAGEMENT SYSTEM </th>
+	 </table>
+	 <br>
+	<div style="color:red">{% if status is defined %} {{ status }}{% endif %}</div>
+         <br>
+
+
+     <input type="file" name="img" style="color:#000;width:600px;margin-left:10px;margin-right:10px;height:40px;font-weight:bold" /><br/>
+	 <p>
+        <button type="submit" style="color:#000;width:100px;margin-left:10px;margin-right:10px;height:40px;font-weight:bold">UPLOAD</button>
+    </p>
+</form>
+
+{% endblock %}
+
+

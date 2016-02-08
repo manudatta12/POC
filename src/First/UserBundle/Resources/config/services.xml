@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <!--
+    <services>
+        <service id="first_user.example" class="First\UserBundle\Example">
+            <argument type="service" id="service_id" />
+            <argument>plain_value</argument>
+            <argument>%parameter_name%</argument>
+        </service>
+    </services>
+    -->
+
+
+  <services>
+        <service id="store_user.registration.form.type" class="First\UserBundle\Form\Type\RegistrationFormType">
+            <tag name="form.type" alias="store_user_registration" />
+            <argument>%fos_user.model.user.class%</argument>
+        </service>
+
+  <service id="fos_user.profile.form.type" class="First\UserBundle\Form\Type\ProfileFormType">
+           <argument>%fos_user.model.user.class%</argument>
+	   <argument type="service" id="doctrine.orm.entity_manager" />
+	   <tag name="form.type" alias="fos_user_profile"/>
+        </service>
+
+
+
+</services>
+
+
+
+
+</container>

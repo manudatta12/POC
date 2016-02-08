@@ -1,0 +1,19 @@
+{% block content %}
+
+Digit e-mag pre-beta launch invite – entry received
+
+Hi,
+
+THANKS FOR YOUR INTEREST
+
+We are still receiving entries from other Digit enthusiasts like you. Expect us to contact you shortly, once the deadline closes and we have thoroughly screened all the entries. 
+
+We are super excited about the e-version initiative of our beloved Digit magazine – JUST LIKE YOU! And hence look forward to your valuable, honest, detailed feedback about the same. 
+
+Keep showering your love on us and stay tuned for our invite!!!
+
+Happy Reading,
+
+Team Digit
+	
+{% endblock %}
